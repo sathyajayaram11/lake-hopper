@@ -41,3 +41,13 @@ Dated log of scope cuts, tech choices, and reversals. Every entry: what was deci
 **Reason:** The PM writes content in parallel with engineering (Section 7's working protocol), and audio assets in particular depend on sourcing real CC0/CC-BY licensed clips, which takes longer than writing a JSON schema. Blocking Phase 1 on that would stall collision, chaser, and checkpoint work for no reason. A hard production gate means a placeholder can never accidentally ship to the batch.
 
 **Reopens if:** v2 needs a staged/partial content rollout (e.g. shipping with some stages still on placeholder audio deliberately) rather than the current all-or-nothing production gate.
+
+---
+
+## 2026-09-14 — Analytics client: `posthog-js-lite` instead of `posthog-js`
+
+**Decision:** `src/core/net/posthog.ts` wraps `posthog-js-lite`, not the full `posthog-js` SDK.
+
+**Reason:** Measured both with a real esbuild+minify+gzip pass covering our actual usage (init + capture): `posthog-js` costs ~98.6KB gzipped; `posthog-js-lite` costs ~23.4KB gzipped — a ~76% reduction. `posthog-js-lite`'s own README describes it as PostHog's intentionally reduced package for teams "conscious about package sizes," covering analytics events and feature flags but dropping autocapture and session replay. We only ever forward a whitelisted set of our own events through `AnalyticsSystem` (Section 3.1) — never autocaptured clicks or pageviews — so the dropped features cost us nothing. Against the 5MB bundle budget (Section 6), saving 75KB on a service wrapper that ships in every build is a clear, no-downside win.
+
+**Reopens if:** a later phase needs a `posthog-js`-only feature — session replay or autocapture — that `posthog-js-lite` doesn't cover.
