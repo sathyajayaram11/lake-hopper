@@ -76,10 +76,10 @@ Structurally, reaching the terrace no longer ends the run: `day_won` fires, a br
 
 ---
 
-## 2026-09-18 — Player stays fixed at world Z=0; the track scrolls, not the player
+## 2026-09-18 — Player stays fixed at world Z=0; the track scrolls, not the player; forward is -Z
 
-**Decision:** The player capsule never moves in world-space Z. Distance traveled is tracked as a `GameState` number (`run.distanceM`), and the track (segments, hazards, pickups) translates toward/past the stationary player to create the illusion of forward motion.
+**Decision:** The player capsule never moves in world-space Z. Distance traveled is tracked as a `GameState` number (`run.distanceM`), and the track (segments, hazards, pickups) translates toward/past the stationary player to create the illusion of forward motion. Forward (the direction the player is running) is world **-Z**; track segments spawn far down the -Z axis and their Z position increases toward and past the player as distance accrues, recycling once they pass behind. The camera sits behind the player on the **+Z** side (`CAMERA_OFFSET.z = +4.5`, corrected from an initial `-4.5` written before this convention was pinned down).
 
-**Reason:** This is the standard endless-runner pattern, and it was forced into the open by writing `src/systems/camera.ts`: the camera's follow-offset math needs to know what "behind and above the player" means in world space, and Section 5 doesn't say explicitly whether the player or the world moves. Keeping the player fixed avoids floating-point precision drift over a long run (a multi-day run — now that days roll into each other — could otherwise push world-space coordinates arbitrarily large) and keeps every position calculation (camera, spawner placement, collision boxes) working in small, stable numbers near the origin.
+**Reason:** This is the standard endless-runner pattern, and it was forced into the open twice: first by `src/systems/camera.ts` (what does "behind and above the player" mean in world space?), then by `src/systems/spawner.ts` (which way do segments move, and which end do they spawn from?). Choosing -Z as forward matches Three.js's default camera orientation (looks down -Z with no extra rotation needed in `scene.ts`). Keeping the player fixed avoids floating-point precision drift over a long run (a multi-day run — now that days roll into each other — could otherwise push world-space coordinates arbitrarily large) and keeps every position calculation (camera, spawner placement, collision boxes) working in small, stable numbers near the origin.
 
 **Reopens if:** a future feature needs the player to genuinely occupy a large, persistent world position (unlikely for this game's design).
