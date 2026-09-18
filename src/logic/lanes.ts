@@ -9,6 +9,11 @@ export function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - clamped, 3);
 }
 
+export function applyLaneDirection(currentLane: 0 | 1 | 2, direction: -1 | 0 | 1): 0 | 1 | 2 {
+  const next = currentLane + direction;
+  return Math.min(Math.max(next, 0), 2) as 0 | 1 | 2;
+}
+
 export function laneTweenX(
   fromLane: 0 | 1 | 2,
   toLane: 0 | 1 | 2,

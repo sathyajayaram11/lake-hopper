@@ -1,6 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { LANE_CHANGE_DURATION_MS, LANE_WIDTH_M } from '../../src/config/lanes';
-import { easeOutCubic, laneToWorldX, laneTweenX } from '../../src/logic/lanes';
+import { applyLaneDirection, easeOutCubic, laneToWorldX, laneTweenX } from '../../src/logic/lanes';
+
+describe('applyLaneDirection', () => {
+  it('moves one lane per direction step', () => {
+    expect(applyLaneDirection(1, -1)).toBe(0);
+    expect(applyLaneDirection(1, 1)).toBe(2);
+  });
+
+  it('clamps at the left edge instead of going out of bounds', () => {
+    expect(applyLaneDirection(0, -1)).toBe(0);
+  });
+
+  it('clamps at the right edge instead of going out of bounds', () => {
+    expect(applyLaneDirection(2, 1)).toBe(2);
+  });
+
+  it('is a no-op for direction 0', () => {
+    expect(applyLaneDirection(1, 0)).toBe(1);
+  });
+});
 
 describe('laneToWorldX', () => {
   it('centers the middle lane at 0 and spaces the outer lanes symmetrically', () => {
