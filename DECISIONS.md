@@ -73,3 +73,13 @@ Structurally, reaching the terrace no longer ends the run: `day_won` fires, a br
 **Reason:** Missions are data the same way stages/hazards/pickups are (Section 3.4) — a non-engineer should be able to add or edit a mission by editing JSON, not code. None of the existing six files (five from Section 4, plus the already-logged `audio.json`) has a natural home for mission definitions without overloading their shape.
 
 **Reopens if:** the mission system turns out simple enough (e.g. always the same three missions, never rotated) to fold into an existing file instead.
+
+---
+
+## 2026-09-18 — Player stays fixed at world Z=0; the track scrolls, not the player
+
+**Decision:** The player capsule never moves in world-space Z. Distance traveled is tracked as a `GameState` number (`run.distanceM`), and the track (segments, hazards, pickups) translates toward/past the stationary player to create the illusion of forward motion.
+
+**Reason:** This is the standard endless-runner pattern, and it was forced into the open by writing `src/systems/camera.ts`: the camera's follow-offset math needs to know what "behind and above the player" means in world space, and Section 5 doesn't say explicitly whether the player or the world moves. Keeping the player fixed avoids floating-point precision drift over a long run (a multi-day run — now that days roll into each other — could otherwise push world-space coordinates arbitrarily large) and keeps every position calculation (camera, spawner placement, collision boxes) working in small, stable numbers near the origin.
+
+**Reopens if:** a future feature needs the player to genuinely occupy a large, persistent world position (unlikely for this game's design).
