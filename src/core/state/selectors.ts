@@ -17,3 +17,7 @@ export function selectRunStatus(state: GameState): RunState['status'] {
 export function selectDistanceM(state: GameState): number {
   return state.run.distanceM;
 }
+
+export function selectIsLoggedIn(state: GameState): boolean {
+  return state.session.loggedIn;
+}

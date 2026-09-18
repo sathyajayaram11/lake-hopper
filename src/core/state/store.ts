@@ -1,12 +1,14 @@
 import { initialPlayerState, playerReducer, type PlayerAction, type PlayerState } from './reducers/playerReducer';
 import { initialRunState, runReducer, type RunAction, type RunState } from './reducers/runReducer';
+import { initialSessionState, sessionReducer, type SessionAction, type SessionState } from './reducers/sessionReducer';
 
 export interface GameState {
   run: RunState;
   player: PlayerState;
+  session: SessionState;
 }
 
-export type Action = RunAction | PlayerAction;
+export type Action = RunAction | PlayerAction | SessionAction;
 
 export interface Store {
   getState(): GameState;
@@ -14,15 +16,16 @@ export interface Store {
   subscribe(listener: (state: GameState) => void): () => void;
 }
 
-const initialState: GameState = { run: initialRunState, player: initialPlayerState };
+const initialState: GameState = { run: initialRunState, player: initialPlayerState, session: initialSessionState };
 
 // Each reducer's `default` branch returns its slice unchanged for action types it
-// doesn't own, so running every action through both reducers is safe.
+// doesn't own, so running every action through all three reducers is safe.
 function rootReducer(state: GameState, action: Action): GameState {
   const run = runReducer(state.run, action as RunAction);
   const player = playerReducer(state.player, action as PlayerAction);
-  if (run === state.run && player === state.player) return state;
-  return { run, player };
+  const session = sessionReducer(state.session, action as SessionAction);
+  if (run === state.run && player === state.player && session === state.session) return state;
+  return { run, player, session };
 }
 
 function createStore(): Store {

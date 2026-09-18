@@ -1,12 +1,13 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { eventBus } from '../events/bus';
+import type { Store } from '../state/store';
 
 export const supabase: SupabaseClient = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY,
 );
 
-export function initSupabaseAuth(): void {
+export function initSupabaseAuth(deps: { store: Store }): void {
   eventBus.on('LoginSubmitted', async ({ name, section }) => {
     const { data, error } = await supabase.auth.signInAnonymously();
     if (error || !data.user) {
@@ -22,6 +23,7 @@ export function initSupabaseAuth(): void {
       return;
     }
 
+    deps.store.dispatch({ type: 'session/loginCompleted', playerId: data.user.id });
     eventBus.emit('login_completed', { playerId: data.user.id, section });
   });
 }

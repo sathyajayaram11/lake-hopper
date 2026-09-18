@@ -31,6 +31,18 @@ describe('store', () => {
     expect(after.player).toBe(before.player);
   });
 
+  it('updates session and leaves run/player untouched on session/loginCompleted', async () => {
+    const store = await freshStore();
+    const before = store.getState();
+
+    store.dispatch({ type: 'session/loginCompleted', playerId: 'p1' });
+
+    const after = store.getState();
+    expect(after.session).toEqual({ loggedIn: true, playerId: 'p1' });
+    expect(after.run).toBe(before.run);
+    expect(after.player).toBe(before.player);
+  });
+
   it('notifies a subscriber after a state-changing dispatch, and stops after unsubscribe', async () => {
     const store = await freshStore();
     const listener = vi.fn();
