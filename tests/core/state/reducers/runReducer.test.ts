@@ -24,6 +24,14 @@ describe('runReducer', () => {
     });
   });
 
+  it('accumulates distanceM on run/distanceAdvanced and leaves other fields untouched', () => {
+    const state: RunState = { ...initialRunState, distanceM: 10, score: 5 };
+
+    const next = runReducer(state, { type: 'run/distanceAdvanced', deltaM: 2.5 });
+
+    expect(next).toEqual({ ...state, distanceM: 12.5 });
+  });
+
   it('returns the same state reference for an unrecognized action', () => {
     const state = initialRunState;
 

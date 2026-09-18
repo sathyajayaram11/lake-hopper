@@ -16,12 +16,16 @@ export const initialRunState: RunState = {
   dayNumber: 1,
 };
 
-export type RunAction = { type: 'run/started'; runId: string };
+export type RunAction =
+  | { type: 'run/started'; runId: string }
+  | { type: 'run/distanceAdvanced'; deltaM: number };
 
 export function runReducer(state: RunState, action: RunAction): RunState {
   switch (action.type) {
     case 'run/started':
       return { status: 'running', runId: action.runId, distanceM: 0, score: 0, isNightOwl: false, dayNumber: 1 };
+    case 'run/distanceAdvanced':
+      return { ...state, distanceM: state.distanceM + action.deltaM };
     default:
       return state;
   }
