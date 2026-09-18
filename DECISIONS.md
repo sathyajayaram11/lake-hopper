@@ -51,3 +51,25 @@ Dated log of scope cuts, tech choices, and reversals. Every entry: what was deci
 **Reason:** Measured both with a real esbuild+minify+gzip pass covering our actual usage (init + capture): `posthog-js` costs ~98.6KB gzipped; `posthog-js-lite` costs ~23.4KB gzipped — a ~76% reduction. `posthog-js-lite`'s own README describes it as PostHog's intentionally reduced package for teams "conscious about package sizes," covering analytics events and feature flags but dropping autocapture and session replay. We only ever forward a whitelisted set of our own events through `AnalyticsSystem` (Section 3.1) — never autocaptured clicks or pageviews — so the dropped features cost us nothing. Against the 5MB bundle budget (Section 6), saving 75KB on a service wrapper that ships in every build is a clear, no-downside win.
 
 **Reopens if:** a later phase needs a `posthog-js`-only feature — session replay or autocapture — that `posthog-js-lite` doesn't cover.
+
+---
+
+## 2026-09-18 — Remove the checkpoint system; days roll into each other instead of ending the run
+
+**Decision:** Cut the checkpoint system entirely: `logic/checkpoints.ts`, `checkpoint.schema.ts`, `checkpointReducer.ts`, `systems/checkpoint.ts`, `CheckpointPrompt.tsx`, `questions.json` and its schema, the `checkpoint_shown`/`checkpoint_resolved` events, the `CheckpointChoiceMade` intent, `StageDefinition.checkpoint`, and the attendance/network stats. Replace with two inline, data-driven mechanics: `HazardDefinition.effect: 'stumble' | 'slow'` (a `'slow'` hazard costs speed for a configured duration without touching the stumble/catch state — for queue crowds and spills), and an optional per-stage `countdown: { seconds, failEffect: 'caught' }` shown on the HUD, which the player must beat by crossing the stage boundary in time (The Door, Submission).
+
+Structurally, reaching the terrace no longer ends the run: `day_won` fires, a brief non-blocking card shows while play continues, and the run rolls into the next day with a per-day speed multiplier and a lightly shuffled stage order. `run.dayNumber` is added to `GameState`, and `run_ended`'s payload carries the day number the run ended on. Night Owl becomes the fixed last stage of each day rather than an optional exit after Day 1. Characters now unlock by brownie points only — the `'threshold'` unlock path (tied to the now-removed attendance/network stats) is gone.
+
+**Reason:** Checkpoints (stop, show a prompt, wait for a choice, resolve it) interrupt the endless-runner feel the whole core loop is built around, and their machinery — an embedded schema, a dedicated reducer, a dedicated system, a UI prompt component, a full question bank, and two separate stat tracks — was disproportionate to the two things they actually did: cost the player something, or gate a moment behind a beatable window. Both of those now live inside the systems that already exist (collision's hazard resolution, stage progression) instead of a parallel one. Letting days roll into each other turns "the day" from a stopping point into a loop the player can keep extending, which is a better fit for a leaderboard-driven, repeatedly-played WhatsApp game — and Night Owl becomes what that loop naturally ends in, rather than an optional bonus round bolted onto the end.
+
+**Reopens if:** a future design wants a genuine stop-and-decide moment with real branching consequence (not just a dodgeable or beatable in-line hazard) — at that point checkpoints, or something shaped like them, would need to come back.
+
+---
+
+## 2026-09-18 — Seventh content file: `content/missions.json`
+
+**Decision:** Add `missions.json` to `content/`, for Phase 3's daily mission system (three rotating missions per day, brownie-point rewards).
+
+**Reason:** Missions are data the same way stages/hazards/pickups are (Section 3.4) — a non-engineer should be able to add or edit a mission by editing JSON, not code. None of the existing six files (five from Section 4, plus the already-logged `audio.json`) has a natural home for mission definitions without overloading their shape.
+
+**Reopens if:** the mission system turns out simple enough (e.g. always the same three missions, never rotated) to fold into an existing file instead.

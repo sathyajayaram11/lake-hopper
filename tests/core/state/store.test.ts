@@ -27,7 +27,7 @@ describe('store', () => {
     store.dispatch({ type: 'run/started', runId: 'r1' });
 
     const after = store.getState();
-    expect(after.run).toEqual({ status: 'running', runId: 'r1', distanceM: 0, score: 0, isNightOwl: false });
+    expect(after.run).toEqual({ status: 'running', runId: 'r1', distanceM: 0, score: 0, isNightOwl: false, dayNumber: 1 });
     expect(after.player).toBe(before.player);
   });
 

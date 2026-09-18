@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { initialRunState, runReducer, type RunState } from '../../../../src/core/state/reducers/runReducer';
 
 describe('runReducer', () => {
-  it('sets status/runId and zeroes distance, score, and isNightOwl on run/started', () => {
+  it('sets status/runId and resets distance, score, isNightOwl, and dayNumber on run/started', () => {
     const staleState: RunState = {
       status: 'ended',
       runId: 'old-run',
       distanceM: 4200,
       score: 900,
       isNightOwl: true,
+      dayNumber: 3,
     };
 
     const next = runReducer(staleState, { type: 'run/started', runId: 'new-run' });
@@ -19,6 +20,7 @@ describe('runReducer', () => {
       distanceM: 0,
       score: 0,
       isNightOwl: false,
+      dayNumber: 1,
     });
   });
 
