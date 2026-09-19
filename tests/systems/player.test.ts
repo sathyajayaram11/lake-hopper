@@ -17,7 +17,7 @@ function fakeInput() {
     consumeIntent: () => {
       const value = next;
       next = 0;
-      return { laneDirection: value };
+      return { laneDirection: value, jumpRequested: false, slideRequested: false };
     },
   };
   return { system, queue: (direction: -1 | 0 | 1) => { next = direction; } };
