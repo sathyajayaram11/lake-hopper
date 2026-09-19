@@ -21,3 +21,11 @@ export function selectDistanceM(state: GameState): number {
 export function selectIsLoggedIn(state: GameState): boolean {
   return state.session.loggedIn;
 }
+
+export function selectCurrentStageId(state: GameState): string {
+  return state.stage.currentStageId;
+}
+
+export function selectCountdownRemainingMs(state: GameState): number | null {
+  return state.stage.countdownRemainingMs;
+}

@@ -43,6 +43,19 @@ describe('store', () => {
     expect(after.player).toBe(before.player);
   });
 
+  it('updates stage and leaves run/player/session untouched on stage/entered', async () => {
+    const store = await freshStore();
+    const before = store.getState();
+
+    store.dispatch({ type: 'stage/entered', stageId: 'gate', stageIndex: 0, visualEffect: null, countdownMs: null });
+
+    const after = store.getState();
+    expect(after.stage).toEqual({ currentStageId: 'gate', stageIndex: 0, visualEffect: null, countdownRemainingMs: null });
+    expect(after.run).toBe(before.run);
+    expect(after.player).toBe(before.player);
+    expect(after.session).toBe(before.session);
+  });
+
   it('notifies a subscriber after a state-changing dispatch, and stops after unsubscribe', async () => {
     const store = await freshStore();
     const listener = vi.fn();
