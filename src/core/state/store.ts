@@ -1,4 +1,5 @@
 import { initialChaserState, chaserReducer, type ChaserAction, type ChaserState } from './reducers/chaserReducer';
+import { initialHazardsState, hazardsReducer, type HazardsAction, type HazardsState } from './reducers/hazardsReducer';
 import { initialPlayerState, playerReducer, type PlayerAction, type PlayerState } from './reducers/playerReducer';
 import { initialRunState, runReducer, type RunAction, type RunState } from './reducers/runReducer';
 import { initialSessionState, sessionReducer, type SessionAction, type SessionState } from './reducers/sessionReducer';
@@ -10,9 +11,10 @@ export interface GameState {
   session: SessionState;
   stage: StageState;
   chaser: ChaserState;
+  hazards: HazardsState;
 }
 
-export type Action = RunAction | PlayerAction | SessionAction | StageAction | ChaserAction;
+export type Action = RunAction | PlayerAction | SessionAction | StageAction | ChaserAction | HazardsAction;
 
 export interface Store {
   getState(): GameState;
@@ -26,26 +28,29 @@ const initialState: GameState = {
   session: initialSessionState,
   stage: initialStageState,
   chaser: initialChaserState,
+  hazards: initialHazardsState,
 };
 
 // Each reducer's `default` branch returns its slice unchanged for action types it
-// doesn't own, so running every action through all five reducers is safe.
+// doesn't own, so running every action through all six reducers is safe.
 function rootReducer(state: GameState, action: Action): GameState {
   const run = runReducer(state.run, action as RunAction);
   const player = playerReducer(state.player, action as PlayerAction);
   const session = sessionReducer(state.session, action as SessionAction);
   const stage = stageReducer(state.stage, action as StageAction);
   const chaser = chaserReducer(state.chaser, action as ChaserAction);
+  const hazards = hazardsReducer(state.hazards, action as HazardsAction);
   if (
     run === state.run &&
     player === state.player &&
     session === state.session &&
     stage === state.stage &&
-    chaser === state.chaser
+    chaser === state.chaser &&
+    hazards === state.hazards
   ) {
     return state;
   }
-  return { run, player, session, stage, chaser };
+  return { run, player, session, stage, chaser, hazards };
 }
 
 function createStore(): Store {

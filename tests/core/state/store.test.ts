@@ -70,6 +70,22 @@ describe('store', () => {
     expect(after.stage).toBe(before.stage);
   });
 
+  it('updates hazards and leaves the other five slices untouched on hazards/updated', async () => {
+    const store = await freshStore();
+    const before = store.getState();
+
+    const hazards = [{ hazardId: 'barrier-arm', lane: 1 as const, distanceFromPlayerM: 40, heightBand: 'mid' as const, effect: 'stumble' as const }];
+    store.dispatch({ type: 'hazards/updated', hazards });
+
+    const after = store.getState();
+    expect(after.hazards).toEqual({ hazards, pickups: [] });
+    expect(after.run).toBe(before.run);
+    expect(after.player).toBe(before.player);
+    expect(after.session).toBe(before.session);
+    expect(after.stage).toBe(before.stage);
+    expect(after.chaser).toBe(before.chaser);
+  });
+
   it('notifies a subscriber after a state-changing dispatch, and stops after unsubscribe', async () => {
     const store = await freshStore();
     const listener = vi.fn();
