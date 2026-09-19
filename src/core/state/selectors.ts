@@ -29,3 +29,7 @@ export function selectCurrentStageId(state: GameState): string {
 export function selectCountdownRemainingMs(state: GameState): number | null {
   return state.stage.countdownRemainingMs;
 }
+
+export function selectChaserDistanceBehindM(state: GameState): number {
+  return state.chaser.distanceBehindM;
+}

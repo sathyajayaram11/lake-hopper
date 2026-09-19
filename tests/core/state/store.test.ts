@@ -56,6 +56,20 @@ describe('store', () => {
     expect(after.session).toBe(before.session);
   });
 
+  it('updates chaser and leaves run/player/session/stage untouched on chaser/reset', async () => {
+    const store = await freshStore();
+    const before = store.getState();
+
+    store.dispatch({ type: 'chaser/reset', targetGapM: 30 });
+
+    const after = store.getState();
+    expect(after.chaser).toEqual({ distanceBehindM: 30, targetGapM: 30 });
+    expect(after.run).toBe(before.run);
+    expect(after.player).toBe(before.player);
+    expect(after.session).toBe(before.session);
+    expect(after.stage).toBe(before.stage);
+  });
+
   it('notifies a subscriber after a state-changing dispatch, and stops after unsubscribe', async () => {
     const store = await freshStore();
     const listener = vi.fn();
