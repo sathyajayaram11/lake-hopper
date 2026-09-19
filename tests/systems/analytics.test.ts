@@ -32,6 +32,19 @@ describe('initAnalyticsSystem', () => {
     expect(capturePostHogEvent).toHaveBeenCalledTimes(3);
   });
 
+  it('forwards player_stumbled and player_caught live', async () => {
+    const bus = await freshBus();
+    const { initAnalyticsSystem } = await import('../../src/systems/analytics');
+    const { capturePostHogEvent } = await import('../../src/core/net/posthog');
+    initAnalyticsSystem({ bus });
+
+    bus.emit('player_stumbled', { stageId: 'gate', distance: 120, hazardId: 'barrier-arm' });
+    bus.emit('player_caught', { stageId: 'gate', distance: 130, hazardId: 'barrier-arm' });
+
+    expect(capturePostHogEvent).toHaveBeenNthCalledWith(1, 'player_stumbled', { stageId: 'gate', distance: 120, hazardId: 'barrier-arm' });
+    expect(capturePostHogEvent).toHaveBeenNthCalledWith(2, 'player_caught', { stageId: 'gate', distance: 130, hazardId: 'barrier-arm' });
+  });
+
   it('does not forward a UI intent event', async () => {
     const bus = await freshBus();
     const { initAnalyticsSystem } = await import('../../src/systems/analytics');

@@ -22,7 +22,7 @@ const appScene = createScene(canvas);
 const input = createInputSystem();
 input.attach();
 
-const player = createPlayerSystem({ input, store });
+const player = createPlayerSystem({ input, store, bus: eventBus });
 const camera = createCameraSystem({ camera: appScene.camera, store });
 const spawner = createSpawnerSystem({ store });
 const playerMesh = createPlayerMesh({ store });

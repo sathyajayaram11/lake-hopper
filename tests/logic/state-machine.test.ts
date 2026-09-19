@@ -84,4 +84,14 @@ describe('transitionPose', () => {
     const afterHit = transitionPose(state('Caught', 0), { ...noInput, stumbleHit: true, chaserWithinCatchRadius: true }, 16);
     expect(afterHit.pose).toBe('Caught');
   });
+
+  it('returns the same reference for a quiet Running tick (no dispatch needed - Running has no duration to track)', () => {
+    const running = state('Running');
+    expect(transitionPose(running, noInput, 16)).toBe(running);
+  });
+
+  it('returns the same reference for a quiet Caught tick', () => {
+    const caught = state('Caught');
+    expect(transitionPose(caught, noInput, 16)).toBe(caught);
+  });
 });

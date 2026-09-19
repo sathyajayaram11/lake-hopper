@@ -93,3 +93,13 @@ Structurally, reaching the terrace no longer ends the run: `day_won` fires, a br
 **Reason:** A direct follow-through of the 2026-09-18 checkpoint removal that got missed at the time. `'SafeZone'` only ever existed to represent the player during a checkpoint's safe-zone activity; with checkpoints gone entirely, nothing produces or consumes that pose. Found while designing `src/logic/state-machine.ts` — a state with no transition in and no transition out is dead code, worse than not having it typed at all.
 
 **Reopens if:** a future mechanic needs a genuine "player is temporarily out of harm's way" pose again.
+
+---
+
+## 2026-09-19 — `player.ts` becomes the sole owner of pose; `collision.ts` reassigned to pickup collection only
+
+**Decision:** Hazard-hit resolution (detecting a hit, calling `logic/collision.ts`, feeding the result into `transitionPose`, dispatching, emitting `player_stumbled`/`player_caught`) all lives in `src/systems/player.ts`. `src/systems/collision.ts` — originally planned to own this — is reassigned to pickup collection only.
+
+**Reason:** `InputSystem.consumeIntent()` can only be called once per tick (it's stateful, reset-on-read), and `player.ts` already had to be that sole caller for lane handling. `transitionPose` also needs exactly one authoritative caller per tick, since it needs a single, consistent `elapsedMs` clock — splitting hazard-detection into a separate `collision.ts` system that also called `transitionPose` would have meant two systems independently tracking pose timing, which can drift out of sync. Since `player.ts` already reads input each tick, it was the natural single owner; `collision.ts`'s pickup-only remaining job doesn't touch pose at all, so it stays a separate, independent system with no such conflict.
+
+**Reopens if:** pose ownership needs to be split for a reason not yet foreseen (e.g. performance, or a genuinely independent pose-affecting system).

@@ -18,7 +18,7 @@ export interface PoseInput {
 
 export function transitionPose(state: PoseState, input: PoseInput, dtMs: number): PoseState {
   if (state.pose === 'Caught') {
-    return { ...state, elapsedMs: state.elapsedMs + dtMs };
+    return state; // terminal; nothing reads Caught's elapsedMs, so no reason to keep advancing it
   }
 
   if (input.stumbleHit) {
@@ -37,7 +37,7 @@ export function transitionPose(state: PoseState, input: PoseInput, dtMs: number)
     case 'Running':
       if (input.jumpRequested) return { ...state, pose: 'Jumping', elapsedMs: 0 };
       if (input.slideRequested) return { ...state, pose: 'Sliding', elapsedMs: 0 };
-      return { ...state, elapsedMs };
+      return state; // Running has no duration to track; avoid a no-op dispatch every tick
     case 'Jumping':
       if (elapsedMs >= JUMP_DURATION_MS) return { ...state, pose: 'Running', elapsedMs: 0 };
       return { ...state, elapsedMs };
