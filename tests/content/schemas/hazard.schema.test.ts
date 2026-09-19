@@ -14,9 +14,16 @@ describe('hazardSchema', () => {
     expect(hazardSchema.safeParse(validHazard).success).toBe(true);
   });
 
-  it('accepts a valid hazard with telegraph', () => {
-    const hazard = { ...validHazard, telegraph: { audio: 'snake-hiss', leadTimeMs: 800 } };
-    expect(hazardSchema.safeParse(hazard).success).toBe(true);
+  it('accepts a valid hazard with telegraph (the snake, per spec — the only telegraphed hazard)', () => {
+    const snakeHazard = {
+      id: 'snake-crossing',
+      lane: 'any' as const,
+      heightBand: 'low' as const,
+      widthM: 1,
+      effect: 'stumble' as const,
+      telegraph: { audio: 'snake-hiss', leadTimeMs: 800 },
+    };
+    expect(hazardSchema.safeParse(snakeHazard).success).toBe(true);
   });
 
   it.each([0, 1, 2, 'any'] as const)('accepts lane %s', (lane) => {

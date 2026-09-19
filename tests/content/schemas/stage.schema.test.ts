@@ -11,7 +11,8 @@ const validStage = {
   pickupWeights: { chai: 1 },
   chaserStartingGapM: 20,
   visualEffect: null,
-  audio: { ambience: ['birds-loud'], music: null, stinger: 'security-laugh' },
+  // Not birds — bird ambience is owned separately, by the hour-based loop, never per-stage.
+  audio: { ambience: ['gate-morning-bustle'], music: null, stinger: 'security-laugh' },
   countdown: null,
 };
 

@@ -16,7 +16,7 @@ How to write `content/*.json`. Each file is a JSON array of objects; every objec
   "chaserStartingGapM": 20,
   "visualEffect": null,
   "audio": {
-    "ambience": ["mess-clatter"],
+    "ambience": ["gate-morning-bustle"],
     "music": "stage-1-theme",
     "stinger": "security-laugh"
   },
@@ -34,10 +34,10 @@ How to write `content/*.json`. Each file is a JSON array of objects; every objec
 
 ```json
 {
-  "id": "barrier-arm",
-  "lane": 1,
-  "heightBand": "mid",
-  "widthM": 1.5,
+  "id": "snake-crossing",
+  "lane": "any",
+  "heightBand": "low",
+  "widthM": 1,
   "effect": "stumble",
   "telegraph": { "audio": "snake-hiss", "leadTimeMs": 800 }
 }
