@@ -1,6 +1,6 @@
 export interface PlayerState {
   lane: 0 | 1 | 2;
-  pose: 'Running' | 'Jumping' | 'Sliding' | 'Stumbling' | 'Caught' | 'SafeZone';
+  pose: 'Running' | 'Jumping' | 'Sliding' | 'Stumbling' | 'Caught';
   shieldCharges: number;
 }
 

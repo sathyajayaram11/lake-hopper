@@ -83,3 +83,13 @@ Structurally, reaching the terrace no longer ends the run: `day_won` fires, a br
 **Reason:** This is the standard endless-runner pattern, and it was forced into the open twice: first by `src/systems/camera.ts` (what does "behind and above the player" mean in world space?), then by `src/systems/spawner.ts` (which way do segments move, and which end do they spawn from?). Choosing -Z as forward matches Three.js's default camera orientation (looks down -Z with no extra rotation needed in `scene.ts`). Keeping the player fixed avoids floating-point precision drift over a long run (a multi-day run — now that days roll into each other — could otherwise push world-space coordinates arbitrarily large) and keeps every position calculation (camera, spawner placement, collision boxes) working in small, stable numbers near the origin.
 
 **Reopens if:** a future feature needs the player to genuinely occupy a large, persistent world position (unlikely for this game's design).
+
+---
+
+## 2026-09-19 — Drop `'SafeZone'` from `PlayerState.pose`
+
+**Decision:** `pose` is now `'Running' | 'Jumping' | 'Sliding' | 'Stumbling' | 'Caught'` — `'SafeZone'` removed.
+
+**Reason:** A direct follow-through of the 2026-09-18 checkpoint removal that got missed at the time. `'SafeZone'` only ever existed to represent the player during a checkpoint's safe-zone activity; with checkpoints gone entirely, nothing produces or consumes that pose. Found while designing `src/logic/state-machine.ts` — a state with no transition in and no transition out is dead code, worse than not having it typed at all.
+
+**Reopens if:** a future mechanic needs a genuine "player is temporarily out of harm's way" pose again.
